@@ -9,8 +9,6 @@ module SpaceWire {
     RMWReply     = 0x1C  # 0b00011100
   }
 
-  # 0 C/R R/W Ver Ack Inc SPL
-
   enum RMAPStatus: U8 {
     Success                = 0,
     GeneralError           = 1,
