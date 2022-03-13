@@ -6,23 +6,34 @@
 #include <cstring> // memcpy
 
 namespace SpaceWire {
-U8* RMAPPacket::encode() {
-  U8 addrLen = 0;
+
+U32 RMAPPacket::getLength() {
   U32 len = 8 + ((0b01000000 & this->m_Type.e) ? 4 : 0) // DataAddr
              + ((this->m_Type != RMAPPacketType::WriteReply) ? (
                4 + ((this->m_Type != RMAPPacketType::ReadCommand) ? this->m_Data.getSize() + 1 // Data Len + Header CRC + Data + Data CRC
                : 0)) : 0);
+  return len;
+}
+
+RMAPEncodeStatus RMAPPacket::encode(Fw::Buffer& buffer) {
+  U8 addrLen = 0;
+  U32 len = this->getLength();
   U32 loc = 0;
 
   if (this->m_DestAddr.getType() != this->m_SourceAddr.getType()) {
-    // TYPE_MISMATCH
+    return RMAPEncodeStatus::ADDR_TYPE_MISMATCH;
   }
   if (this->m_DataLen > 16777216) { // 2**24
-    // DATA LEN TOO LONG
+    return RMAPEncodeStatus::DATA_LEN_OVERRUN;
   }
   if (this->m_DataLen != this->m_Data.getSize() && this->m_Type != RMAPPacketType::WriteReply && this->m_Type != RMAPPacketType::ReadCommand) {
-    // LENGTH MISMATCH
+    return RMAPEncodeStatus::DATA_LEN_MISMATCH;
   }
+  if (len != buffer.getSize()) {
+    return RMAPEncodeStatus::BUFFER_LEN_MISMATCH;
+  }
+
+  // RMW Data + Mask length check
 
   if (this->m_SourceAddr.getType() == SpaceWireAddrType::PHYSICAL) {
     addrLen = addrPad(this->m_SourceAddr);
@@ -30,83 +41,81 @@ U8* RMAPPacket::encode() {
     len += m_DestAddr.getLength();
   }
 
-  U8* buff = (U8*) malloc(len);
-
   if (this->m_SourceAddr.getType() == SpaceWireAddrType::PHYSICAL) {
     NATIVE_INT_TYPE l;
-    memcpy(buff, this->m_DestAddr.getPhysicalAddr(l), this->m_DestAddr.getLength());
+    memcpy(buffer.getData(), this->m_DestAddr.getPhysicalAddr(l), this->m_DestAddr.getLength());
     loc += this->m_DestAddr.getLength();
   }
 
-  buff[loc] = this->m_DestAddr.getLogicalAddr();
+  buffer.getData()[loc] = this->m_DestAddr.getLogicalAddr();
   loc++;
 
-  buff[loc] = (U8) SpaceWireProtocolID::RMAP;
+  buffer.getData()[loc] = (U8) SpaceWireProtocolID::RMAP;
   loc++;
 
   U8 flags = (U8) this->m_Type.e | (this->m_Verify ? 0b00010000 : 0) | (this->m_Ack ? 0b00001000 : 0) | (this->m_Increment ? 0b00000100 : 0) | (0b00000011 & (addrLen/4));
-  buff[loc] = flags;
+  buffer.getData()[loc] = flags;
   loc++;
 
   if (0b01000000 & this->m_Type.e) {
-    buff[loc] = this->m_DestKey;
+    buffer.getData()[loc] = this->m_DestKey;
   }else {
-    buff[loc] = (U8) this->m_Status.e;
+    buffer.getData()[loc] = (U8) this->m_Status.e;
   }
   loc++;
 
   if (this->m_SourceAddr.getType() == SpaceWireAddrType::PHYSICAL) {
     NATIVE_INT_TYPE l;
-    memcpy(buff + loc, this->m_SourceAddr.getPhysicalAddr(l), this->m_SourceAddr.getLength());
+    memcpy(buffer.getData() + loc, this->m_SourceAddr.getPhysicalAddr(l), this->m_SourceAddr.getLength());
     loc += this->m_SourceAddr.getLength();
   }
 
-  buff[loc] = this->m_SourceAddr.getLogicalAddr();
+  buffer.getData()[loc] = this->m_SourceAddr.getLogicalAddr();
   loc++;
 
-  buff[loc + 0] = static_cast<U8>(this->m_TransID >> 8);
-  buff[loc + 1] = static_cast<U8>(this->m_TransID);
+  buffer.getData()[loc + 0] = static_cast<U8>(this->m_TransID >> 8);
+  buffer.getData()[loc + 1] = static_cast<U8>(this->m_TransID);
   loc += 2;
 
   if (0b01000000 & this->m_Type.e) {
-    buff[loc] = this->m_ExtDataAddr;
-    buff[loc + 1] = static_cast<U8>(this->m_DataAddr >> 24);
-    buff[loc + 2] = static_cast<U8>(this->m_DataAddr >> 16);
-    buff[loc + 3] = static_cast<U8>(this->m_DataAddr >> 8);
-    buff[loc + 4] = static_cast<U8>(this->m_DataAddr);
+    buffer.getData()[loc] = this->m_ExtDataAddr;
+    buffer.getData()[loc + 1] = static_cast<U8>(this->m_DataAddr >> 24);
+    buffer.getData()[loc + 2] = static_cast<U8>(this->m_DataAddr >> 16);
+    buffer.getData()[loc + 3] = static_cast<U8>(this->m_DataAddr >> 8);
+    buffer.getData()[loc + 4] = static_cast<U8>(this->m_DataAddr);
     loc += 5;
   }else if (this->m_Type == RMAPPacketType::WriteReply) {
-    U8 replyCRC = RMAPPacket::CRC(buff + this->m_DestAddr.getLength(), loc - this->m_DestAddr.getLength());
-    buff[loc] = replyCRC;
-    return buff;
+    U8 replyCRC = RMAPPacket::CRC(buffer.getData() + this->m_DestAddr.getLength(), loc - this->m_DestAddr.getLength());
+    buffer.getData()[loc] = replyCRC;
+    return RMAPEncodeStatus::SUCCESS;
   }else {
-    buff[loc] = 0;
+    buffer.getData()[loc] = 0;
     loc++;
   }
 
-  buff[loc + 0] = static_cast<U8>(this->m_DataLen >> 16);
-  buff[loc + 1] = static_cast<U8>(this->m_DataLen >> 8);
-  buff[loc + 2] = static_cast<U8>(this->m_DataLen);
+  buffer.getData()[loc + 0] = static_cast<U8>(this->m_DataLen >> 16);
+  buffer.getData()[loc + 1] = static_cast<U8>(this->m_DataLen >> 8);
+  buffer.getData()[loc + 2] = static_cast<U8>(this->m_DataLen);
   loc += 3;
 
-  U8 headerCRC = RMAPPacket::CRC(buff + this->m_DestAddr.getLength(), loc - this->m_DestAddr.getLength());
-  buff[loc] = headerCRC;
+  U8 headerCRC = RMAPPacket::CRC(buffer.getData() + this->m_DestAddr.getLength(), loc - this->m_DestAddr.getLength());
+  buffer.getData()[loc] = headerCRC;
   loc++;
 
   if (this->m_Type == RMAPPacketType::ReadCommand) {
-    return buff;
+    return RMAPEncodeStatus::SUCCESS;
   }
 
-  memcpy(buff + loc, this->m_Data.getData(), this->m_Data.getSize());
+  memcpy(buffer.getData() + loc, this->m_Data.getData(), this->m_Data.getSize());
   loc += this->m_Data.getSize();
 
   U8 dataCRC = RMAPPacket::CRC(this->m_Data.getData(), this->m_Data.getSize());
-  buff[loc] = dataCRC;
+  buffer.getData()[loc] = dataCRC;
 
-  return buff;
+  return RMAPEncodeStatus::SUCCESS;
 }
 
-U8 RMAPPacket::addrPad(SpaceWireAddr& addr) const {
+U8 RMAPPacket::addrPad(SpaceWireAddr& addr) {
   NATIVE_INT_TYPE l;
   (void) addr.getPhysicalAddr(l);
   U8* addrData = (U8*) malloc(l);
