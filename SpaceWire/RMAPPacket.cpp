@@ -12,6 +12,8 @@ U32 RMAPPacket::getLength() {
              + ((this->m_Type != RMAPPacketType::WriteReply) ? (
                4 + ((this->m_Type != RMAPPacketType::ReadCommand) ? this->m_Data.getSize() + 1 // Data Len + Header CRC + Data + Data CRC
                : 0)) : 0);
+  len += addrPad(this->m_SourceAddr);
+  len += m_DestAddr.getLength();
   return len;
 }
 
@@ -36,12 +38,6 @@ RMAPEncodeStatus RMAPPacket::encode(Fw::Buffer& buffer) {
   // RMW Data + Mask length check
 
   if (this->m_SourceAddr.getType() == SpaceWireAddrType::PHYSICAL) {
-    addrLen = addrPad(this->m_SourceAddr);
-    len += addrLen;
-    len += m_DestAddr.getLength();
-  }
-
-  if (this->m_SourceAddr.getType() == SpaceWireAddrType::PHYSICAL) {
     memcpy(buffer.getData(), this->m_DestAddr.getPhysicalAddr(), this->m_DestAddr.getLength());
     loc += this->m_DestAddr.getLength();
   }
@@ -63,7 +59,7 @@ RMAPEncodeStatus RMAPPacket::encode(Fw::Buffer& buffer) {
   }
   loc++;
 
-  if (this->m_SourceAddr.getType() == SpaceWireAddrType::PHYSICAL) {
+  if (this->m_SourceAddr.getType() == SpaceWireAddrType::PHYSICAL && 0b01000000 & this->m_Type.e) {
     memcpy(buffer.getData() + loc, this->m_SourceAddr.getPhysicalAddr(), this->m_SourceAddr.getLength());
     loc += this->m_SourceAddr.getLength();
   }
@@ -120,6 +116,7 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
   while (buffer.getData()[loc] < 32) { // skip over path address
     loc++;
   }
+  U8 bgloc = loc;
   U8* destpath = (U8*) malloc(loc);
   memcpy(destpath, buffer.getData(), loc);
   packet.setDestAddr(SpaceWireAddr(buffer.getData()[loc], destpath, loc, loc > 0 ? SpaceWireAddrType::PHYSICAL : SpaceWireAddrType::LOGICAL));
@@ -135,7 +132,9 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
   loc++;
 
   // There's probably a better way of doing this
-  if ((0b11111100 & flags) == RMAPPacketType::RMWCommand) {
+  if (0b10000000 & flags) {
+    return RMAPDecodeStatus::UNK_PACKET_TYPE;
+  }else if ((0b11111100 & flags) == RMAPPacketType::RMWCommand) {
     packet.setType(RMAPPacketType::RMWCommand);
   }else if ((0b11111100 & flags) == RMAPPacketType::RMWReply) {
     packet.setType(RMAPPacketType::RMWReply);
@@ -147,8 +146,6 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
     packet.setType(RMAPPacketType::WriteReply);
   }else if ((0b01100000 & flags) == RMAPPacketType::WriteCommand) {
     packet.setType(RMAPPacketType::WriteCommand);
-  }else {
-    return RMAPDecodeStatus::UNK_PACKET_TYPE;
   }
 
   packet.setVerify   (0b00010000 & flags);
@@ -165,7 +162,9 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
   loc++;
 
   U8* srcpath = (U8*) malloc(srcpathlen);
-  memcpy(srcpath, buffer.getData() + loc, srcpathlen);
+  if (0b01000000 & packet.m_Type.e) {
+    memcpy(srcpath, buffer.getData() + loc, srcpathlen);
+  }
   packet.setSourceAddr(SpaceWireAddr(buffer.getData()[loc + srcpathlen], destpath, srcpathlen, srcpathlen > 0 ? SpaceWireAddrType::PHYSICAL : SpaceWireAddrType::LOGICAL));
   free(srcpath);
   loc += srcpathlen + 1;
@@ -204,7 +203,7 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
   );
   loc += 3;
 
-  U8 newCRC = RMAPPacket::CRC(buffer.getData(), loc);
+  U8 newCRC = RMAPPacket::CRC(buffer.getData() + bgloc, loc-bgloc);
   if (newCRC != buffer.getData()[loc]) {
     return RMAPDecodeStatus::BAD_HEADER_CRC;
   }
@@ -224,6 +223,8 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
   Fw::Buffer databuf = Fw::Buffer((U8*) malloc(packet.getDataLen()), packet.getDataLen(), 0x123);
 
   memcpy(databuf.getData(), buffer.getData() + loc, packet.getDataLen());
+
+  packet.setData(databuf);
 
   return RMAPDecodeStatus::SUCCESS;
 }
@@ -252,43 +253,17 @@ U8 RMAPPacket::addrPad(SpaceWireAddr& addr) {
 }
 
 bool RMAPPacket::operator==(const RMAPPacket& src) const {
-  if (src.m_DestAddr.getType() == this->m_DestAddr.getType()) {
-    if (src.m_DestAddr.getType() == SpaceWireAddrType::PHYSICAL) {
-      if (src.m_DestAddr.getLength() == this->m_DestAddr.getLength()) {
-        for (NATIVE_INT_TYPE i = 0; i < src.m_DestAddr.getLength(); i++) {
-          if (src.m_DestAddr.getPhysicalAddr()[i] != this->m_DestAddr.getPhysicalAddr()[i]) {
-            return false;
-          }
-        }
-      }else {
-        return false;
-      }
-    }else if (src.m_DestAddr.getLogicalAddr() != this->m_DestAddr.getLogicalAddr()){
+  if (0b01000000 & src.m_Type.e) {
+    SpaceWireAddr a = src.m_SourceAddr;
+    SpaceWireAddr b = this->m_SourceAddr;
+    (void) RMAPPacket::addrPad(a);
+    (void) RMAPPacket::addrPad(b);
+    if (!(a == b)) {
       return false;
     }
-  }else {
-    return false;
   }
-
-  if (src.m_SourceAddr.getType() == this->m_SourceAddr.getType()) {
-    if (src.m_SourceAddr.getType() == SpaceWireAddrType::PHYSICAL) {
-      if (src.m_SourceAddr.getLength() == this->m_SourceAddr.getLength()) {
-        for (NATIVE_INT_TYPE i = 0; i < src.m_SourceAddr.getLength(); i++) {
-          if (src.m_SourceAddr.getPhysicalAddr()[i] != this->m_SourceAddr.getPhysicalAddr()[i]) {
-            return false;
-          }
-        }
-      }else {
-        return false;
-      }
-    }else if (src.m_SourceAddr.getLogicalAddr() != this->m_SourceAddr.getLogicalAddr()){
-      return false;
-    }
-  }else {
-    return false;
-  }
-
-  if ((src.m_Type == this->m_Type) &&
+  if ((src.m_DestAddr == this->m_DestAddr) &&
+      (src.m_Type == this->m_Type) &&
       (src.getVerify() == this->getVerify()) &&
       (src.getAck() == this->getAck()) &&
       (src.getIncrement() == this->getIncrement()) &&
@@ -321,6 +296,57 @@ bool RMAPPacket::getAck() const {
 bool RMAPPacket::getIncrement() const {
     return this->m_Increment ? true : (0b00000100 & (U8) this->m_Type.e);
 }
+
+#if FW_SERIALIZABLE_TO_STRING  || BUILD_UT
+
+void RMAPPacket::toString(Fw::StringBase& text) const {
+
+    static const char * formatString =
+       "("
+       "Type = %s, "
+       "Verify = %s, "
+       "Ack = %s, "
+       "Increment = %s, "
+       "Status = %s, "
+       "DestKey = %u, "
+       "TransID = %u, "
+       "ExtDataAddr = %u, "
+       "DataAddr = %u, "
+       "DataLen = %u, "
+       "Data = %s"
+       ")";
+
+    // declare strings to hold any serializable toString() arguments
+
+    Fw::String TypeStr;
+    this->m_Type.toString(TypeStr);
+
+    Fw::String StatusStr;
+    this->m_Status.toString(StatusStr);
+
+    Fw::String DataStr;
+    this->m_Data.toString(DataStr);
+
+    char outputString[FW_SERIALIZABLE_TO_STRING_BUFFER_SIZE];
+    (void)snprintf(outputString,FW_SERIALIZABLE_TO_STRING_BUFFER_SIZE,formatString
+       ,TypeStr.toChar()
+       ,this->m_Verify?"T":"F"
+       ,this->m_Ack?"T":"F"
+       ,this->m_Increment?"T":"F"
+       ,StatusStr.toChar()
+       ,this->m_DestKey
+       ,this->m_TransID
+       ,this->m_ExtDataAddr
+       ,this->m_DataAddr
+       ,this->m_DataLen
+       ,DataStr.toChar()
+    );
+    outputString[FW_SERIALIZABLE_TO_STRING_BUFFER_SIZE-1] = 0; // NULL terminate
+
+    text = outputString;
+}
+
+#endif
 
 /* The table used to calculate the CRC for a buffer */
 U8 RMAP_CRCTable[] = {

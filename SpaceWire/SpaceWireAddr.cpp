@@ -41,12 +41,23 @@ SpaceWireAddr& SpaceWireAddr::operator=(const SpaceWireAddr& src) {
 }
 
 bool SpaceWireAddr::operator==(const SpaceWireAddr& src) const {
-    return (
-        (src.m_LogicalAddr == this->m_LogicalAddr) &&
-        (src.m_PhysicalAddr == this->m_PhysicalAddr) &&
-        (src.m_Type == this->m_Type) &&
-        (src.m_Length == this->m_Length) &&
-        true);
+  if (src.getType() == this->getType()) {
+    if (src.getType() == SpaceWireAddrType::PHYSICAL) {
+      if (src.getLength() == this->getLength()) {
+        for (NATIVE_INT_TYPE i = 0; i < src.getLength(); i++) {
+          if (src.getPhysicalAddr()[i] != this->getPhysicalAddr()[i]) {
+            return false;
+          }
+        }
+        return true;
+      }else {
+        return false;
+      }
+    }else if (src.getLogicalAddr() == this->getLogicalAddr()){
+      return true;
+    }
+  }
+  return false;
 }
 
 void SpaceWireAddr::set(U8 LogicalAddr, const U8* PhysicalAddr, U8 Length, const SpaceWire::SpaceWireAddrType& Type) {
@@ -72,7 +83,7 @@ const SpaceWire::SpaceWireAddrType& SpaceWireAddr::getType() const {
 }
 
 U8 SpaceWireAddr::getLength() const {
-    return this->m_Length;
+    return this->m_Type == SpaceWireAddrType::PHYSICAL ? this->m_Length : 0;
 }
 
 void SpaceWireAddr::setLogicalAddr(U8 val) {

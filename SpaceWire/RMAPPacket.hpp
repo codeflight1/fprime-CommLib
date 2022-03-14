@@ -42,6 +42,10 @@ namespace SpaceWire {
 
       bool operator==(const RMAPPacket& src) const;
 
+#if FW_SERIALIZABLE_TO_STRING || BUILD_UT
+      void toString(Fw::StringBase& text) const;
+#endif
+
     private:
       static U8 addrPad(SpaceWireAddr& addr);
 

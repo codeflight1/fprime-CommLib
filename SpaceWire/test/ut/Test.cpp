@@ -6,9 +6,8 @@
 
 #include <cstdlib>
 
-#include "EncodeStatusTest.cpp"
-#include "DecodeStatusTest.cpp"
-#include "EncodeDecodeTest.cpp"
+#include "EncodeTest.cpp"
+#include "DecodeTest.cpp"
 
 int main(int argc, char* argv[]) {
     ::testing::InitGoogleTest(&argc, argv);
