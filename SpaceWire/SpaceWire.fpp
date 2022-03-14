@@ -13,12 +13,7 @@ module SpaceWire {
     LOGICAL
   }
 
-  struct SpaceWireAddr {
-    LogicalAddr: U8,
-    PhysicalAddr: [8] U8,
-    Type: SpaceWireAddrType,
-    Length: U8
-  }
+  type SpaceWireAddr
 
   struct SpaceWirePacket {
     LogicalAddr: U8,

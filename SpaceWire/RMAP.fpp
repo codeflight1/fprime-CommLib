@@ -1,12 +1,12 @@
 module SpaceWire {
 
   enum RMAPPacketType: U8 {
-    WriteCommand = 0x60, # 0b011xxx00
-    WriteReply   = 0x28, # 0b001x1x00
-    ReadCommand  = 0x48, # 0b01001x00
-    ReadReply    = 0x08, # 0b00001x00
-    RMWCommand   = 0x5C, # 0b01011100
-    RMWReply     = 0x1C  # 0b00011100
+    WriteCommand = 0x60, # 0b011xxxaa
+    WriteReply   = 0x28, # 0b001x1xaa
+    ReadCommand  = 0x48, # 0b01001xaa
+    ReadReply    = 0x08, # 0b00001xaa
+    RMWCommand   = 0x5C, # 0b010111aa
+    RMWReply     = 0x1C  # 0b000111aa
   }
 
   enum RMAPStatus: U8 {

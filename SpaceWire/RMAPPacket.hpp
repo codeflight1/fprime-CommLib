@@ -7,12 +7,12 @@
 #ifndef RMAPPACKET_HPP_
 #define RMAPPACKET_HPP_
 
-#include <SpaceWire/SpaceWireAddrSerializableAc.hpp>
+#include <SpaceWire/SpaceWireAddr.hpp>
 #include <SpaceWire/RMAPPacketBaseSerializableAc.hpp>
 #include <Fw/Buffer/Buffer.hpp>
 
 namespace SpaceWire {
-  enum RMAPEncodeStatus {
+  enum class RMAPEncodeStatus {
     SUCCESS,
     ADDR_TYPE_MISMATCH,
     DATA_LEN_OVERRUN,
@@ -21,16 +21,26 @@ namespace SpaceWire {
     RMW_DATA_MISMATCH
   };
 
-  enum RMAPDecodeStatus {
-
+  enum class RMAPDecodeStatus {
+    SUCCESS,
+    WRONG_PROTOCOL,
+    UNK_PACKET_TYPE,
+    BAD_HEADER_CRC,
+    BAD_DATA_CRC
   };
 
   class RMAPPacket : public RMAPPacketBase {
     public:
       RMAPEncodeStatus encode(Fw::Buffer& buffer);
-      RMAPDecodeStatus decode(const Fw::Buffer& buffer);
+      static RMAPDecodeStatus decode(RMAPPacket& packet, const Fw::Buffer& buffer);
 
       U32 getLength();
+
+      bool getVerify() const;
+      bool getAck() const;
+      bool getIncrement() const;
+
+      bool operator==(const RMAPPacket& src) const;
 
     private:
       static U8 addrPad(SpaceWireAddr& addr);
