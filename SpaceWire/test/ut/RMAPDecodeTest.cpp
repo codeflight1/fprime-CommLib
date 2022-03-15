@@ -1,4 +1,4 @@
-TEST(DecodeTest, BasicTest) {
+TEST(RMAPDecodeTest, BasicTest) {
   U8 dat[1] = {0x02};
 
   SpaceWire::RMAPPacket packet = SpaceWire::RMAPPacket();
@@ -18,7 +18,7 @@ TEST(DecodeTest, BasicTest) {
   ASSERT_EQ(packet, decoded);
 }
 
-TEST(DecodeTest, WRONG_PROTOCOLTest) {
+TEST(RMAPDecodeTest, WRONG_PROTOCOLTest) {
   U8 in[8] = {0x54, 0x02, 0x28, 0x00, 0x76, 0x00, 0x05, 0xc4};
 
   SpaceWire::RMAPPacket packet;
@@ -28,7 +28,7 @@ TEST(DecodeTest, WRONG_PROTOCOLTest) {
   ASSERT_EQ(status, SpaceWire::RMAPDecodeStatus::WRONG_PROTOCOL);
 }
 
-TEST(DecodeTest, UNK_PACKET_TYPETest) {
+TEST(RMAPDecodeTest, UNK_PACKET_TYPETest) {
   U8 in[8] = {0x54, 0x01, 0xFF, 0x00, 0x76, 0x00, 0x05, 0xc4};
 
   SpaceWire::RMAPPacket packet;
@@ -38,7 +38,7 @@ TEST(DecodeTest, UNK_PACKET_TYPETest) {
   ASSERT_EQ(status, SpaceWire::RMAPDecodeStatus::UNK_PACKET_TYPE);
 }
 
-TEST(DecodeTest, BAD_HEADER_CRCTest) {
+TEST(RMAPDecodeTest, BAD_HEADER_CRCTest) {
   U8 in[8] = {0x54, 0x01, 0x28, 0x00, 0x76, 0x00, 0x05, 0xFF};
 
   SpaceWire::RMAPPacket packet;
@@ -48,7 +48,7 @@ TEST(DecodeTest, BAD_HEADER_CRCTest) {
   ASSERT_EQ(status, SpaceWire::RMAPDecodeStatus::BAD_HEADER_CRC);
 }
 
-TEST(DecodeTest, BAD_DATA_CRCTest) {
+TEST(RMAPDecodeTest, BAD_DATA_CRCTest) {
   U8 in[18] = {0x54, 0x01, 0x70, 0x00, 0x76, 0x00, 0x05, 0x00, 0, 0, 0, 1, 0, 0, 1, 0xF0, 0x02, 0x10};
 
   SpaceWire::RMAPPacket packet;

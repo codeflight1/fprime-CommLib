@@ -1,4 +1,4 @@
-TEST(EncodeTest, ADDR_TYPE_MISMATCHTest) {
+TEST(RMAPEncodeTest, ADDR_TYPE_MISMATCHTest) {
   U8 dat[1] = {0xFF};
 
   SpaceWire::RMAPPacket packet = SpaceWire::RMAPPacket();
@@ -13,7 +13,7 @@ TEST(EncodeTest, ADDR_TYPE_MISMATCHTest) {
   ASSERT_EQ(status, SpaceWire::RMAPEncodeStatus::ADDR_TYPE_MISMATCH);
 }
 
-TEST(EncodeTest, DATA_LEN_OVERRUNTest) {
+TEST(RMAPEncodeTest, DATA_LEN_OVERRUNTest) {
   U8 dat[1] = {0xFF};
 
   SpaceWire::RMAPPacket packet = SpaceWire::RMAPPacket();
@@ -28,7 +28,7 @@ TEST(EncodeTest, DATA_LEN_OVERRUNTest) {
   ASSERT_EQ(status, SpaceWire::RMAPEncodeStatus::DATA_LEN_OVERRUN);
 }
 
-TEST(EncodeTest, DATA_LEN_MISMATCHTest) {
+TEST(RMAPEncodeTest, DATA_LEN_MISMATCHTest) {
   U8 dat[1] = {0xFF};
 
   SpaceWire::RMAPPacket packet = SpaceWire::RMAPPacket();
@@ -43,7 +43,7 @@ TEST(EncodeTest, DATA_LEN_MISMATCHTest) {
   ASSERT_EQ(status, SpaceWire::RMAPEncodeStatus::DATA_LEN_MISMATCH);
 }
 
-TEST(EncodeTest, BUFFER_LEN_MISMATCHTest) {
+TEST(RMAPEncodeTest, BUFFER_LEN_MISMATCHTest) {
   U8 dat[1] = {0xFF};
 
   SpaceWire::RMAPPacket packet = SpaceWire::RMAPPacket();
@@ -59,7 +59,7 @@ TEST(EncodeTest, BUFFER_LEN_MISMATCHTest) {
 }
 
 /* // Not yet implemented
-TEST(EncodeTest, RMW_DATA_MISMATCHTest) {
+TEST(RMAPEncodeTest, RMW_DATA_MISMATCHTest) {
   U8 dat[1] = {0xFF};
 
   SpaceWire::RMAPPacket packet = SpaceWire::RMAPPacket();

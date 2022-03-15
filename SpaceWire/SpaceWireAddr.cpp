@@ -1,4 +1,4 @@
-#include <SpaceWire/SpaceWireAddrSerializableAc.hpp>
+#include <SpaceWire/SpaceWireAddr.hpp>
 #include <Fw/Types/Assert.hpp>
 #include <Fw/Types/BasicTypes.hpp>
 #include <Fw/Types/StringUtils.hpp>

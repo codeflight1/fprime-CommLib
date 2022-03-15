@@ -25,7 +25,7 @@ RMAPEncodeStatus RMAPPacket::encode(Fw::Buffer& buffer) {
   if (this->m_DestAddr.getType() != this->m_SourceAddr.getType()) {
     return RMAPEncodeStatus::ADDR_TYPE_MISMATCH;
   }
-  if (this->m_DataLen > 16777216) { // 2**24
+  if (this->m_DataLen >= 16777216) { // 2**24
     return RMAPEncodeStatus::DATA_LEN_OVERRUN;
   }
   if (this->m_DataLen != this->m_Data.getSize() && this->m_Type != RMAPPacketType::WriteReply && this->m_Type != RMAPPacketType::ReadCommand) {
