@@ -17,3 +17,29 @@ TEST(CCSDSDecodeTest, BasicTest) {
   ASSERT_EQ(status2, SpaceWire::CCSDSDecodeStatus::SUCCESS);
   ASSERT_EQ(packet, decoded);
 }
+
+TEST(CCSDSDecodeTest, RSRVD_NZTest) {
+  SpaceWire::CCSDSPacket packet = SpaceWire::CCSDSPacket();
+
+  U8 data[8] = {0x22, 0x02, 0x10, 0x10, 0x00, 0x16, 0xc0, 0x10};
+
+  Fw::Buffer buf = Fw::Buffer(data, 8, 0x01);
+
+  SpaceWire::CCSDSPacket decoded;
+  SpaceWire::CCSDSDecodeStatus status2 = packet.decode(decoded, buf);
+
+  ASSERT_EQ(status2, SpaceWire::CCSDSDecodeStatus::RSRVD_NZ);
+}
+
+TEST(CCSDSDecodeTest, WRONG_PROTOCOLTest) {
+  SpaceWire::CCSDSPacket packet = SpaceWire::CCSDSPacket();
+
+  U8 data[8] = {0x22, 0x03, 0x00, 0x10, 0x00, 0x16, 0xc0, 0x10};
+
+  Fw::Buffer buf = Fw::Buffer(data, 10, 0x01);
+
+  SpaceWire::CCSDSPacket decoded;
+  SpaceWire::CCSDSDecodeStatus status2 = packet.decode(decoded, buf);
+
+  ASSERT_EQ(status2, SpaceWire::CCSDSDecodeStatus::WRONG_PROTOCOL);
+}
