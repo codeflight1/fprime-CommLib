@@ -13,6 +13,23 @@ module SpaceWire {
     LOGICAL
   }
 
+  enum SerDesStatus {
+    SUCCESS,
+    ADDR_TYPE_MISMATCH,
+    DATA_LEN_OVERRUN,
+    DATA_LEN_MISMATCH,
+    BUFFER_LEN_MISMATCH,
+    RMW_DATA_MISMATCH,
+    WRONG_PROTOCOL,
+    BAD_HEADER_CRC,
+    BAD_DATA_CRC,
+    RSRVD_NZ,
+    SIZE_MISMATCH,
+    APID_OVERFLOW,
+    SEQCNT_OVERFLOW,
+    DATA_OVERFLOW
+  }
+
   type SpaceWireAddr
 
   port RMAPPacketPort( p: RMAPPacket )

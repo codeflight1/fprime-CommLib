@@ -8,13 +8,13 @@ TEST(RMAPDecodeTest, BasicTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x02);
 
-  SpaceWire::RMAPEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
   SpaceWire::RMAPPacket decoded;
 
-  SpaceWire::RMAPDecodeStatus status2 = packet.decode(decoded, outbuf);
+  SpaceWire::SerDesStatus status2 = packet.decode(decoded, outbuf);
 
-  ASSERT_EQ(status2, SpaceWire::RMAPDecodeStatus::SUCCESS);
+  ASSERT_EQ(status2, SpaceWire::SerDesStatus::SUCCESS);
   ASSERT_EQ(packet, decoded);
 }
 
@@ -23,19 +23,19 @@ TEST(RMAPDecodeTest, WRONG_PROTOCOLTest) {
 
   SpaceWire::RMAPPacket packet;
 
-  SpaceWire::RMAPDecodeStatus status = SpaceWire::RMAPPacket::decode(packet, Fw::Buffer(in, 8, 0x02));
+  SpaceWire::SerDesStatus status = SpaceWire::RMAPPacket::decode(packet, Fw::Buffer(in, 8, 0x02));
 
-  ASSERT_EQ(status, SpaceWire::RMAPDecodeStatus::WRONG_PROTOCOL);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::WRONG_PROTOCOL);
 }
 
-TEST(RMAPDecodeTest, UNK_PACKET_TYPETest) {
+TEST(RMAPDecodeTest, RSRVD_NZTest) {
   U8 in[8] = {0x54, 0x01, 0xFF, 0x00, 0x76, 0x00, 0x05, 0xc4};
 
   SpaceWire::RMAPPacket packet;
 
-  SpaceWire::RMAPDecodeStatus status = SpaceWire::RMAPPacket::decode(packet, Fw::Buffer(in, 8, 0x02));
+  SpaceWire::SerDesStatus status = SpaceWire::RMAPPacket::decode(packet, Fw::Buffer(in, 8, 0x02));
 
-  ASSERT_EQ(status, SpaceWire::RMAPDecodeStatus::UNK_PACKET_TYPE);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::RSRVD_NZ);
 }
 
 TEST(RMAPDecodeTest, BAD_HEADER_CRCTest) {
@@ -43,9 +43,9 @@ TEST(RMAPDecodeTest, BAD_HEADER_CRCTest) {
 
   SpaceWire::RMAPPacket packet;
 
-  SpaceWire::RMAPDecodeStatus status = SpaceWire::RMAPPacket::decode(packet, Fw::Buffer(in, 8, 0x02));
+  SpaceWire::SerDesStatus status = SpaceWire::RMAPPacket::decode(packet, Fw::Buffer(in, 8, 0x02));
 
-  ASSERT_EQ(status, SpaceWire::RMAPDecodeStatus::BAD_HEADER_CRC);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::BAD_HEADER_CRC);
 }
 
 TEST(RMAPDecodeTest, BAD_DATA_CRCTest) {
@@ -53,7 +53,7 @@ TEST(RMAPDecodeTest, BAD_DATA_CRCTest) {
 
   SpaceWire::RMAPPacket packet;
 
-  SpaceWire::RMAPDecodeStatus status = SpaceWire::RMAPPacket::decode(packet, Fw::Buffer(in, 18, 0x02));
+  SpaceWire::SerDesStatus status = SpaceWire::RMAPPacket::decode(packet, Fw::Buffer(in, 18, 0x02));
 
-  ASSERT_EQ(status, SpaceWire::RMAPDecodeStatus::BAD_DATA_CRC);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::BAD_DATA_CRC);
 }

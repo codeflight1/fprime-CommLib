@@ -17,22 +17,22 @@ U32 RMAPPacket::getLength() {
   return len;
 }
 
-RMAPEncodeStatus RMAPPacket::encode(Fw::Buffer& buffer) {
+SerDesStatus RMAPPacket::encode(Fw::Buffer& buffer) {
   U8 addrLen = 0;
   U32 len = this->getLength();
   U32 loc = 0;
 
   if (this->m_DestAddr.getType() != this->m_SourceAddr.getType()) {
-    return RMAPEncodeStatus::ADDR_TYPE_MISMATCH;
+    return SerDesStatus::ADDR_TYPE_MISMATCH;
   }
   if (this->m_DataLen >= 16777216) { // 2**24
-    return RMAPEncodeStatus::DATA_LEN_OVERRUN;
+    return SerDesStatus::DATA_LEN_OVERRUN;
   }
   if (this->m_DataLen != this->m_Data.getSize() && this->m_Type != RMAPPacketType::WriteReply && this->m_Type != RMAPPacketType::ReadCommand) {
-    return RMAPEncodeStatus::DATA_LEN_MISMATCH;
+    return SerDesStatus::DATA_LEN_MISMATCH;
   }
   if (len != buffer.getSize()) {
-    return RMAPEncodeStatus::BUFFER_LEN_MISMATCH;
+    return SerDesStatus::BUFFER_LEN_MISMATCH;
   }
 
   // RMW Data + Mask length check
@@ -81,7 +81,7 @@ RMAPEncodeStatus RMAPPacket::encode(Fw::Buffer& buffer) {
   }else if (this->m_Type == RMAPPacketType::WriteReply) {
     U8 replyCRC = RMAPPacket::CRC(buffer.getData() + this->m_DestAddr.getLength(), loc - this->m_DestAddr.getLength());
     buffer.getData()[loc] = replyCRC;
-    return RMAPEncodeStatus::SUCCESS;
+    return SerDesStatus::SUCCESS;
   }else {
     buffer.getData()[loc] = 0;
     loc++;
@@ -97,7 +97,7 @@ RMAPEncodeStatus RMAPPacket::encode(Fw::Buffer& buffer) {
   loc++;
 
   if (this->m_Type == RMAPPacketType::ReadCommand) {
-    return RMAPEncodeStatus::SUCCESS;
+    return SerDesStatus::SUCCESS;
   }
 
   memcpy(buffer.getData() + loc, this->m_Data.getData(), this->m_Data.getSize());
@@ -106,10 +106,10 @@ RMAPEncodeStatus RMAPPacket::encode(Fw::Buffer& buffer) {
   U8 dataCRC = RMAPPacket::CRC(this->m_Data.getData(), this->m_Data.getSize());
   buffer.getData()[loc] = dataCRC;
 
-  return RMAPEncodeStatus::SUCCESS;
+  return SerDesStatus::SUCCESS;
 }
 
-RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer) {
+SerDesStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer) {
   packet = RMAPPacket();
 
   U32 loc = 0;
@@ -124,7 +124,7 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
   loc++;
 
   if (static_cast<SpaceWireProtocolID::t>(buffer.getData()[loc]) != SpaceWireProtocolID::RMAP) {
-    return RMAPDecodeStatus::WRONG_PROTOCOL;
+    return SerDesStatus::WRONG_PROTOCOL;
   }
   loc++;
 
@@ -133,7 +133,7 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
 
   // There's probably a better way of doing this
   if (0b10000000 & flags) {
-    return RMAPDecodeStatus::UNK_PACKET_TYPE;
+    return SerDesStatus::RSRVD_NZ;
   }else if ((0b11111100 & flags) == RMAPPacketType::RMWCommand) {
     packet.setType(RMAPPacketType::RMWCommand);
   }else if ((0b11111100 & flags) == RMAPPacketType::RMWReply) {
@@ -188,9 +188,9 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
   }else if (packet.getType() == RMAPPacketType::WriteReply) {
     U8 newCRC = RMAPPacket::CRC(buffer.getData(), loc);
     if (newCRC == buffer.getData()[loc]) {
-      return RMAPDecodeStatus::SUCCESS;
+      return SerDesStatus::SUCCESS;
     }else {
-      return RMAPDecodeStatus::BAD_HEADER_CRC;
+      return SerDesStatus::BAD_HEADER_CRC;
     }
   }else {
     loc++; // skip over reserved byte
@@ -205,18 +205,18 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
 
   U8 newCRC = RMAPPacket::CRC(buffer.getData() + bgloc, loc-bgloc);
   if (newCRC != buffer.getData()[loc]) {
-    return RMAPDecodeStatus::BAD_HEADER_CRC;
+    return SerDesStatus::BAD_HEADER_CRC;
   }
   loc++;
 
   if (packet.getType() == RMAPPacketType::ReadCommand) {
-    return RMAPDecodeStatus::SUCCESS;
+    return SerDesStatus::SUCCESS;
   }
 
   if (packet.getVerify()) {
     U8 dataCRC = RMAPPacket::CRC(buffer.getData() + loc, packet.getDataLen());
     if (dataCRC != buffer.getData()[loc + packet.getDataLen()]) {
-      return RMAPDecodeStatus::BAD_DATA_CRC;
+      return SerDesStatus::BAD_DATA_CRC;
     }
   }
 
@@ -226,7 +226,7 @@ RMAPDecodeStatus RMAPPacket::decode(RMAPPacket& packet, const Fw::Buffer& buffer
 
   packet.setData(databuf);
 
-  return RMAPDecodeStatus::SUCCESS;
+  return SerDesStatus::SUCCESS;
 }
 
 U8 RMAPPacket::addrPad(SpaceWireAddr& addr) {

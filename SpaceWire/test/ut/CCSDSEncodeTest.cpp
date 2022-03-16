@@ -9,9 +9,9 @@ TEST(CCSDSEncodeTest, SIZE_MISMATCHTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength()+10, 0x01);
 
-  SpaceWire::CCSDSEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::CCSDSEncodeStatus::SIZE_MISMATCH);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::SIZE_MISMATCH);
 }
 
 TEST(CCSDSEncodeTest, APID_OVERFLOWTest) {
@@ -25,9 +25,9 @@ TEST(CCSDSEncodeTest, APID_OVERFLOWTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x01);
 
-  SpaceWire::CCSDSEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::CCSDSEncodeStatus::APID_OVERFLOW);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::APID_OVERFLOW);
 }
 
 TEST(CCSDSEncodeTest, SEQCNT_OVERFLOWTest) {
@@ -41,9 +41,9 @@ TEST(CCSDSEncodeTest, SEQCNT_OVERFLOWTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x01);
 
-  SpaceWire::CCSDSEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::CCSDSEncodeStatus::SEQCNT_OVERFLOW);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::SEQCNT_OVERFLOW);
 }
 
 TEST(CCSDSEncodeTest, DATA_OVERFLOWTest) {
@@ -57,7 +57,7 @@ TEST(CCSDSEncodeTest, DATA_OVERFLOWTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x01);
 
-  SpaceWire::CCSDSEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::CCSDSEncodeStatus::DATA_OVERFLOW);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::DATA_OVERFLOW);
 }

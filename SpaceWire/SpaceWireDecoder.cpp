@@ -60,9 +60,9 @@ namespace SpaceWire {
   {
     CCSDSPacket packet = p;
     Fw::Buffer buf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x01);
-    CCSDSEncodeStatus status = packet.encode(buf);
+    SerDesStatus status = packet.encode(buf);
 
-    if (status == CCSDSEncodeStatus::SUCCESS) {
+    if (status == SerDesStatus::SUCCESS) {
       this->dataOut_out(0, buf);
     }
     // TODO: error handling
@@ -76,9 +76,9 @@ namespace SpaceWire {
   {
     RMAPPacket packet = p;
     Fw::Buffer buf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x01);
-    RMAPEncodeStatus status = packet.encode(buf);
+    SerDesStatus status = packet.encode(buf);
 
-    if (status == RMAPEncodeStatus::SUCCESS) {
+    if (status == SerDesStatus::SUCCESS) {
       this->dataOut_out(0, buf);
     }
     // TODO: error handling
@@ -100,9 +100,9 @@ namespace SpaceWire {
       case SpaceWireProtocolID::RMAP:
         {
           RMAPPacket packet;
-          RMAPDecodeStatus status = RMAPPacket::decode(packet, fwBuffer);
+          SerDesStatus status = RMAPPacket::decode(packet, fwBuffer);
 
-          if (status == RMAPDecodeStatus::SUCCESS) {
+          if (status == SerDesStatus::SUCCESS) {
             this->RMAPout_out(0, packet);
           }
         }
@@ -111,9 +111,9 @@ namespace SpaceWire {
       case SpaceWireProtocolID::CCSDS:
         {
           CCSDSPacket packet;
-          CCSDSDecodeStatus status = CCSDSPacket::decode(packet, fwBuffer);
+          SerDesStatus status = CCSDSPacket::decode(packet, fwBuffer);
 
-          if (status != CCSDSDecodeStatus::SUCCESS) {
+          if (status != SerDesStatus::SUCCESS) {
             break; // TODO
           }
 

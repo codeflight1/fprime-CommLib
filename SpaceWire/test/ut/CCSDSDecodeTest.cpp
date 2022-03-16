@@ -9,12 +9,12 @@ TEST(CCSDSDecodeTest, BasicTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x01);
 
-  SpaceWire::CCSDSEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
   SpaceWire::CCSDSPacket decoded;
-  SpaceWire::CCSDSDecodeStatus status2 = packet.decode(decoded, outbuf);
+  SpaceWire::SerDesStatus status2 = packet.decode(decoded, outbuf);
 
-  ASSERT_EQ(status2, SpaceWire::CCSDSDecodeStatus::SUCCESS);
+  ASSERT_EQ(status2, SpaceWire::SerDesStatus::SUCCESS);
   ASSERT_EQ(packet, decoded);
 }
 
@@ -26,9 +26,9 @@ TEST(CCSDSDecodeTest, RSRVD_NZTest) {
   Fw::Buffer buf = Fw::Buffer(data, 8, 0x01);
 
   SpaceWire::CCSDSPacket decoded;
-  SpaceWire::CCSDSDecodeStatus status2 = packet.decode(decoded, buf);
+  SpaceWire::SerDesStatus status2 = packet.decode(decoded, buf);
 
-  ASSERT_EQ(status2, SpaceWire::CCSDSDecodeStatus::RSRVD_NZ);
+  ASSERT_EQ(status2, SpaceWire::SerDesStatus::RSRVD_NZ);
 }
 
 TEST(CCSDSDecodeTest, WRONG_PROTOCOLTest) {
@@ -39,7 +39,7 @@ TEST(CCSDSDecodeTest, WRONG_PROTOCOLTest) {
   Fw::Buffer buf = Fw::Buffer(data, 10, 0x01);
 
   SpaceWire::CCSDSPacket decoded;
-  SpaceWire::CCSDSDecodeStatus status2 = packet.decode(decoded, buf);
+  SpaceWire::SerDesStatus status2 = packet.decode(decoded, buf);
 
-  ASSERT_EQ(status2, SpaceWire::CCSDSDecodeStatus::WRONG_PROTOCOL);
+  ASSERT_EQ(status2, SpaceWire::SerDesStatus::WRONG_PROTOCOL);
 }

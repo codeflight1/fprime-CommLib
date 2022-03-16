@@ -6,21 +6,21 @@
 #include <cstdlib> // malloc
 
 namespace SpaceWire {
-  CCSDSEncodeStatus CCSDSPacket::encode(Fw::Buffer& buffer) {
+  SerDesStatus CCSDSPacket::encode(Fw::Buffer& buffer) {
     if (buffer.getSize() != this->getLength()) {
-      return CCSDSEncodeStatus::SIZE_MISMATCH;
+      return SerDesStatus::SIZE_MISMATCH;
     }
 
     if (this->m_APID >= 2048) {
-      return CCSDSEncodeStatus::APID_OVERFLOW;
+      return SerDesStatus::APID_OVERFLOW;
     }
 
     if (this->m_SeqCnt >= 16384) {
-      return CCSDSEncodeStatus::SEQCNT_OVERFLOW;
+      return SerDesStatus::SEQCNT_OVERFLOW;
     }
 
     if (this->m_Data.getSize() > 65536) {
-      return CCSDSEncodeStatus::DATA_OVERFLOW;
+      return SerDesStatus::DATA_OVERFLOW;
     }
 
     U8 loc = 0;
@@ -53,10 +53,10 @@ namespace SpaceWire {
 
     memcpy(buffer.getData() + loc + 6, this->m_Data.getData(), this->m_Data.getSize());
 
-    return CCSDSEncodeStatus::SUCCESS;
+    return SerDesStatus::SUCCESS;
   }
 
-  CCSDSDecodeStatus CCSDSPacket::decode(CCSDSPacket& packet, Fw::Buffer& buffer) {
+  SerDesStatus CCSDSPacket::decode(CCSDSPacket& packet, Fw::Buffer& buffer) {
     U32 loc = 0;
     while (buffer.getData()[loc] < 32) { // skip over path address
       loc++;
@@ -66,12 +66,12 @@ namespace SpaceWire {
     loc++;
 
     if (static_cast<SpaceWireProtocolID::t>(buffer.getData()[loc]) != SpaceWireProtocolID::CCSDS) {
-      return CCSDSDecodeStatus::WRONG_PROTOCOL;
+      return SerDesStatus::WRONG_PROTOCOL;
     }
     loc++;
 
     if (buffer.getData()[loc] != 0x00) {
-      return CCSDSDecodeStatus::RSRVD_NZ;
+      return SerDesStatus::RSRVD_NZ;
     }
     loc++;
 
@@ -107,7 +107,7 @@ namespace SpaceWire {
     memcpy(databuf.getData(), buffer.getData() + loc, datalen);
     packet.setData(databuf);
 
-    return CCSDSDecodeStatus::SUCCESS;
+    return SerDesStatus::SUCCESS;
   }
 
   bool CCSDSPacket::operator==(const CCSDSPacket& src) const {

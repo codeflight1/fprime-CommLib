@@ -8,9 +8,9 @@ TEST(RMAPEncodeTest, ADDR_TYPE_MISMATCHTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x02);
 
-  SpaceWire::RMAPEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::RMAPEncodeStatus::ADDR_TYPE_MISMATCH);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::ADDR_TYPE_MISMATCH);
 }
 
 TEST(RMAPEncodeTest, DATA_LEN_OVERRUNTest) {
@@ -23,9 +23,9 @@ TEST(RMAPEncodeTest, DATA_LEN_OVERRUNTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x02);
 
-  SpaceWire::RMAPEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::RMAPEncodeStatus::DATA_LEN_OVERRUN);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::DATA_LEN_OVERRUN);
 }
 
 TEST(RMAPEncodeTest, DATA_LEN_MISMATCHTest) {
@@ -38,9 +38,9 @@ TEST(RMAPEncodeTest, DATA_LEN_MISMATCHTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x02);
 
-  SpaceWire::RMAPEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::RMAPEncodeStatus::DATA_LEN_MISMATCH);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::DATA_LEN_MISMATCH);
 }
 
 TEST(RMAPEncodeTest, BUFFER_LEN_MISMATCHTest) {
@@ -53,9 +53,9 @@ TEST(RMAPEncodeTest, BUFFER_LEN_MISMATCHTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), 10, 0x02);
 
-  SpaceWire::RMAPEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::RMAPEncodeStatus::BUFFER_LEN_MISMATCH);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::BUFFER_LEN_MISMATCH);
 }
 
 /* // Not yet implemented
@@ -69,8 +69,8 @@ TEST(RMAPEncodeTest, RMW_DATA_MISMATCHTest) {
 
   Fw::Buffer outbuf = Fw::Buffer((U8*) malloc(packet.getLength()), packet.getLength(), 0x02);
 
-  SpaceWire::RMAPEncodeStatus status = packet.encode(outbuf);
+  SpaceWire::SerDesStatus status = packet.encode(outbuf);
 
-  ASSERT_EQ(status, SpaceWire::RMAPEncodeStatus::RMW_DATA_MISMATCH);
+  ASSERT_EQ(status, SpaceWire::SerDesStatus::RMW_DATA_MISMATCH);
 }
 */
