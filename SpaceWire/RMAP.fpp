@@ -40,4 +40,6 @@ module SpaceWire {
     DataLen: U32, # serialized as U24
     Data: Fw.Buffer
   }
+
+  type RMAPPacket
 }

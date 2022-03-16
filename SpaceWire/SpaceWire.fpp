@@ -15,16 +15,37 @@ module SpaceWire {
 
   type SpaceWireAddr
 
-  struct SpaceWirePacket {
-    LogicalAddr: U8,
-    Protocol: SpaceWireProtocolID,
-    Data: Fw.Buffer
-  }
+  port RMAPPacketPort( p: RMAPPacket )
+  port CCSDSPacketPort( p: CCSDSPacket )
 
-  struct CCSDSPacket {
-    Header: U16,
-    ControlSequence: U16,
-    Length: U16,
-    Data: Fw.Buffer
+  active component SpaceWireDecoder {
+    async input port dataIn: Fw.BufferSend
+
+    output port dataOut: Fw.BufferSend
+
+    async input port RMAPin: RMAPPacketPort
+
+    async input port CCSDSin: [32] CCSDSPacketPort
+
+    async input port rawIn: [32] Fw.BufferSend
+
+    output port RMAPout: RMAPPacketPort
+
+    output port CCSDSout: [32] CCSDSPacketPort
+
+    output port rawOut: [32] Fw.BufferSend
+
+    async command registerAPID(APID: U16, portNum: U8) opcode 0x00
+
+    async command registerProtocol(protocol: U8, portNum: U8) opcode 0x01
+
+    @ Command receive port
+    command recv port cmdIn
+
+    @ Command registration port
+    command reg port cmdRegOut
+
+    @ Command response port
+    command resp port cmdResponseOut
   }
 }

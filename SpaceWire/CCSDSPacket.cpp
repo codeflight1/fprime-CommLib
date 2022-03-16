@@ -3,6 +3,7 @@
 #include <SpaceWire/SpaceWireProtocolIDEnumAc.hpp>
 
 #include <cstring> // memcpy
+#include <cstdlib> // malloc
 
 namespace SpaceWire {
   CCSDSEncodeStatus CCSDSPacket::encode(Fw::Buffer& buffer) {

@@ -16,4 +16,6 @@ module SpaceWire {
     SeqCnt: U16, # serialized as 14
     Data: Fw.Buffer
   }
+
+  type CCSDSPacket
 }

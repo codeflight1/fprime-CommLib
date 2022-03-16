@@ -13,6 +13,10 @@ A SpaceWire module for [F Prime](https://github.com/nasa/fprime).
 #### Todo:
 * Secondary header support
 
+### Driver bridge (80%)
+#### Todo:
+* Error handling
+* Proper memory allocation
+
 ## Planned Features
 * RMAP Target Component
-* Decoding Component
