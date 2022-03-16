@@ -1,5 +1,6 @@
 module SpaceWire {
 
+  @ SpaceWire protocol ID
   enum SpaceWireProtocolID: U8 {
     Extended = 0,
     RMAP = 1,
@@ -8,11 +9,13 @@ module SpaceWire {
     STUP = 239
   }
 
+  @ SpaceWire address type
   enum SpaceWireAddrType {
     PHYSICAL,
     LOGICAL
   }
 
+  @ SpaceWire packet serialize/deserialize status
   enum SerDesStatus {
     SUCCESS,
     ADDR_TYPE_MISMATCH,
@@ -30,30 +33,43 @@ module SpaceWire {
     DATA_OVERFLOW
   }
 
+  @ SpaceWire address type
   type SpaceWireAddr
 
   port RMAPPacketPort( p: RMAPPacket )
   port CCSDSPacketPort( p: CCSDSPacket )
 
+  @ SpaceWire decoder component
   active component SpaceWireDecoder {
+
+    @ Input data port from SpaceWire driver
     async input port dataIn: Fw.BufferSend
 
+    @ Output data port to SpaceWire driver
     output port dataOut: Fw.BufferSend
 
+    @ Input data port from RMAP controller
     async input port RMAPin: RMAPPacketPort
 
+    @ Input data port from CCSDS components
     async input port CCSDSin: [32] CCSDSPacketPort
 
+    @ Raw input data port
     async input port rawIn: [32] Fw.BufferSend
 
+    @ Output data port to RMAP controller
     output port RMAPout: RMAPPacketPort
 
+    @ Output data port to CCSDS components
     output port CCSDSout: [32] CCSDSPacketPort
 
+    @ Raw output data port
     output port rawOut: [32] Fw.BufferSend
 
+    @ Registers APID to port number
     async command registerAPID(APID: U16, portNum: U8) opcode 0x00
 
+    @ Registers custom protocol ID to port number
     async command registerProtocol(protocol: U8, portNum: U8) opcode 0x01
 
     @ Command receive port

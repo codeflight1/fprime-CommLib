@@ -1,5 +1,6 @@
 module SpaceWire {
 
+  @ RMAP packet type enum
   enum RMAPPacketType: U8 {
     WriteCommand = 0x60, # 0b011xxxaa
     WriteReply   = 0x28, # 0b001x1xaa
@@ -9,6 +10,7 @@ module SpaceWire {
     RMWReply     = 0x1C  # 0b000111aa
   }
 
+  @ RMAP response status enum
   enum RMAPStatus: U8 {
     Success                = 0,
     GeneralError           = 1,
@@ -25,6 +27,7 @@ module SpaceWire {
     InvalidDestLogicalAddr = 12
   }
 
+  @ RMAP packet base class
   struct RMAPPacketBase {
     DestAddr: SpaceWireAddr,
     SourceAddr: SpaceWireAddr,
@@ -41,5 +44,6 @@ module SpaceWire {
     Data: Fw.Buffer
   }
 
+  @ RMAP packet class
   type RMAPPacket
 }

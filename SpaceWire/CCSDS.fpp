@@ -1,4 +1,6 @@
 module SpaceWire {
+
+  @ CCSDS sequence type enum
   enum CCSDSSeqType: U8 {
     Segment = 0x00,
     FirstSegment = 0x01,
@@ -6,6 +8,7 @@ module SpaceWire {
     UnSegmented = 0x03
   }
 
+  @ CCSDS packet base class
   struct CCSDSPacketBase {
     TargetAddr: SpaceWireAddr,
     UserApplication: U8,
@@ -17,5 +20,6 @@ module SpaceWire {
     Data: Fw.Buffer
   }
 
+  @ CCSDS packet class
   type CCSDSPacket
 }

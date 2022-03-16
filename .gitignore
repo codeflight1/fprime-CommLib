@@ -1,7 +1,3 @@
-src/CLICKS/CLICKS
-tests/test
-a.out
-
 build/
 build*/
 gtest/
@@ -45,7 +41,7 @@ coverity.out
 #*#
 .#*
 
-**/docs/*.html
+**/docs/html/
 *-template
 
 logs

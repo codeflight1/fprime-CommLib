@@ -49,28 +49,28 @@ namespace SpaceWire {
       //!
       void CCSDSin_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          const SpaceWire::CCSDSPacket &p
+          const SpaceWire::CCSDSPacket &p /*!< Incoming CCSDS packet */
       );
 
       //! Handler implementation for RMAPin
       //!
       void RMAPin_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          const SpaceWire::RMAPPacket &p
+          const SpaceWire::RMAPPacket &p /*!< Incoming RMAP packet */
       );
 
       //! Handler implementation for dataIn
       //!
       void dataIn_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &fwBuffer
+          Fw::Buffer &fwBuffer /*!< Incoming data from SpaceWire driver */
       );
 
       //! Handler implementation for rawIn
       //!
       void rawIn_handler(
           const NATIVE_INT_TYPE portNum, /*!< The port number*/
-          Fw::Buffer &fwBuffer
+          Fw::Buffer &fwBuffer /*!< Incoming raw data */
       );
 
     PRIVATE:
@@ -84,8 +84,8 @@ namespace SpaceWire {
       void registerAPID_cmdHandler(
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq, /*!< The command sequence number*/
-          U16 APID,
-          U8 portNum
+          U16 APID, /*!< APID to register */
+          U8 portNum /*!< Port number to register APID to */
       );
 
       //! Implementation for registerProtocol command handler
@@ -93,14 +93,14 @@ namespace SpaceWire {
       void registerProtocol_cmdHandler(
           const FwOpcodeType opCode, /*!< The opcode*/
           const U32 cmdSeq, /*!< The command sequence number*/
-          U8 protocol,
-          U8 portNum
+          U8 protocol, /*!< Protocol to register */
+          U8 portNum /*!< Port number to register protocol to */
       );
 
     PRIVATE:
 
-      U16 APID[32];
-      U8 protocol[32];
+      U16 APID[32]; /*!< Registered APIDs */
+      U8 protocol[32]; /*!< Registered custom protocols */
 
     };
 
