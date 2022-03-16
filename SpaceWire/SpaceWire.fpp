@@ -39,8 +39,8 @@ module SpaceWire {
   port RMAPPacketPort( p: RMAPPacket )
   port CCSDSPacketPort( p: CCSDSPacket )
 
-  @ SpaceWire decoder component
-  active component SpaceWireDecoder {
+  @ SpaceWire controller component
+  active component SpaceWireController {
 
     @ Input data port from SpaceWire driver
     async input port dataIn: Fw.BufferSend

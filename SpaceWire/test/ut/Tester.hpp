@@ -1,19 +1,19 @@
 // ======================================================================
 // \title  Tester.hpp
 // \author codeflight
-// \brief  hpp file for SpaceWireDecoder test harness implementation class
+// \brief  hpp file for SpaceWireController test harness implementation class
 // ======================================================================
 
 #ifndef TESTER_HPP
 #define TESTER_HPP
 
 #include "GTestBase.hpp"
-#include "SpaceWire/SpaceWireDecoder.hpp"
+#include "SpaceWire/SpaceWireController.hpp"
 
 namespace SpaceWire {
 
   class Tester :
-    public SpaceWireDecoderGTestBase
+    public SpaceWireControllerGTestBase
   {
 
       // ----------------------------------------------------------------------
@@ -98,7 +98,7 @@ namespace SpaceWire {
 
       //! The component under test
       //!
-      SpaceWireDecoder component;
+      SpaceWireController component;
 
   };
 

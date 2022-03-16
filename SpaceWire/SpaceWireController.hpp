@@ -1,19 +1,19 @@
 // ======================================================================
-// \title  SpaceWireDecoder.hpp
+// \title  SpaceWireController.hpp
 // \author codeflight
-// \brief  hpp file for SpaceWireDecoder component implementation class
+// \brief  hpp file for SpaceWireController component implementation class
 //
 // ======================================================================
 
-#ifndef SpaceWireDecoder_HPP
-#define SpaceWireDecoder_HPP
+#ifndef SpaceWireController_HPP
+#define SpaceWireController_HPP
 
-#include "SpaceWire/SpaceWireDecoderComponentAc.hpp"
+#include "SpaceWire/SpaceWireControllerComponentAc.hpp"
 
 namespace SpaceWire {
 
-  class SpaceWireDecoder :
-    public SpaceWireDecoderComponentBase
+  class SpaceWireController :
+    public SpaceWireControllerComponentBase
   {
 
     public:
@@ -22,22 +22,22 @@ namespace SpaceWire {
       // Construction, initialization, and destruction
       // ----------------------------------------------------------------------
 
-      //! Construct object SpaceWireDecoder
+      //! Construct object SpaceWireController
       //!
-      SpaceWireDecoder(
+      SpaceWireController(
           const char *const compName /*!< The component name*/
       );
 
-      //! Initialize object SpaceWireDecoder
+      //! Initialize object SpaceWireController
       //!
       void init(
           const NATIVE_INT_TYPE queueDepth, /*!< The queue depth*/
           const NATIVE_INT_TYPE instance = 0 /*!< The instance number*/
       );
 
-      //! Destroy object SpaceWireDecoder
+      //! Destroy object SpaceWireController
       //!
-      ~SpaceWireDecoder();
+      ~SpaceWireController();
 
     PRIVATE:
 

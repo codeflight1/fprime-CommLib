@@ -1,7 +1,7 @@
 // ======================================================================
 // \title  Tester.hpp
 // \author codeflight
-// \brief  cpp file for SpaceWireDecoder test harness implementation class
+// \brief  cpp file for SpaceWireController test harness implementation class
 // ======================================================================
 
 #include "Tester.hpp"
@@ -19,10 +19,10 @@ namespace SpaceWire {
   Tester ::
     Tester() :
 #if FW_OBJECT_NAMES == 1
-      SpaceWireDecoderGTestBase("Tester", MAX_HISTORY_SIZE),
+      SpaceWireControllerGTestBase("Tester", MAX_HISTORY_SIZE),
       component("SpaceWireDecoder")
 #else
-      SpaceWireDecoderGTestBase(MAX_HISTORY_SIZE),
+      SpaceWireControllerGTestBase(MAX_HISTORY_SIZE),
       component()
 #endif
   {

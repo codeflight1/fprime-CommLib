@@ -1,12 +1,12 @@
 // ======================================================================
-// \title  SpaceWireDecoder.cpp
+// \title  SpaceWireController.cpp
 // \author codeflight
-// \brief  cpp file for SpaceWireDecoder component implementation class
+// \brief  cpp file for SpaceWireController component implementation class
 //
 // ======================================================================
 
 
-#include <SpaceWire/SpaceWireDecoder.hpp>
+#include <SpaceWire/SpaceWireController.hpp>
 #include <SpaceWire/SpaceWireProtocolIDEnumAc.cpp>
 #include <SpaceWire/RMAPPacket.cpp>
 #include <SpaceWire/CCSDSPacket.cpp>
@@ -20,21 +20,21 @@ namespace SpaceWire {
   // Construction, initialization, and destruction
   // ----------------------------------------------------------------------
 
-  SpaceWireDecoder ::
-    SpaceWireDecoder(
+  SpaceWireController ::
+    SpaceWireController(
         const char *const compName
-    ) : SpaceWireDecoderComponentBase(compName)
+    ) : SpaceWireControllerComponentBase(compName)
   {
 
   }
 
-  void SpaceWireDecoder ::
+  void SpaceWireController ::
     init(
         const NATIVE_INT_TYPE queueDepth,
         const NATIVE_INT_TYPE instance
     )
   {
-    SpaceWireDecoderComponentBase::init(queueDepth, instance);
+    SpaceWireControllerComponentBase::init(queueDepth, instance);
 
     for (NATIVE_INT_TYPE i = 0; i < 32; i++) {
       this->APID[i] = 0;
@@ -42,8 +42,8 @@ namespace SpaceWire {
     }
   }
 
-  SpaceWireDecoder ::
-    ~SpaceWireDecoder()
+  SpaceWireController ::
+    ~SpaceWireController()
   {
 
   }
@@ -52,7 +52,7 @@ namespace SpaceWire {
   // Handler implementations for user-defined typed input ports
   // ----------------------------------------------------------------------
 
-  void SpaceWireDecoder ::
+  void SpaceWireController ::
     CCSDSin_handler(
         const NATIVE_INT_TYPE portNum,
         const SpaceWire::CCSDSPacket &p
@@ -68,7 +68,7 @@ namespace SpaceWire {
     // TODO: error handling
   }
 
-  void SpaceWireDecoder ::
+  void SpaceWireController ::
     RMAPin_handler(
         const NATIVE_INT_TYPE portNum,
         const SpaceWire::RMAPPacket &p
@@ -84,7 +84,7 @@ namespace SpaceWire {
     // TODO: error handling
   }
 
-  void SpaceWireDecoder ::
+  void SpaceWireController ::
     dataIn_handler(
         const NATIVE_INT_TYPE portNum,
         Fw::Buffer &fwBuffer
@@ -137,7 +137,7 @@ namespace SpaceWire {
     }
   }
 
-  void SpaceWireDecoder ::
+  void SpaceWireController ::
     rawIn_handler(
         const NATIVE_INT_TYPE portNum,
         Fw::Buffer &fwBuffer
@@ -150,7 +150,7 @@ namespace SpaceWire {
   // Command handler implementations
   // ----------------------------------------------------------------------
 
-  void SpaceWireDecoder ::
+  void SpaceWireController ::
     registerAPID_cmdHandler(
         const FwOpcodeType opCode,
         const U32 cmdSeq,
@@ -165,7 +165,7 @@ namespace SpaceWire {
     this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
   }
 
-  void SpaceWireDecoder ::
+  void SpaceWireController ::
     registerProtocol_cmdHandler(
         const FwOpcodeType opCode,
         const U32 cmdSeq,
