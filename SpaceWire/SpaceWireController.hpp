@@ -10,6 +10,8 @@
 
 #include "SpaceWire/SpaceWireControllerComponentAc.hpp"
 
+#include <SpaceWire/FppConstantsAc.hpp>
+
 namespace SpaceWire {
 
   class SpaceWireController :
@@ -73,34 +75,40 @@ namespace SpaceWire {
           Fw::Buffer &fwBuffer /*!< Incoming raw data */
       );
 
-    PRIVATE:
-
-      // ----------------------------------------------------------------------
-      // Command handler implementations
-      // ----------------------------------------------------------------------
-
-      //! Implementation for registerAPID command handler
-      //!
-      void registerAPID_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
+      void registerAPID_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U16 APID, /*!< APID to register */
-          U8 portNum /*!< Port number to register APID to */
+          bool used /*!< Register or deregister */
       );
 
-      //! Implementation for registerProtocol command handler
-      //!
-      void registerProtocol_cmdHandler(
-          const FwOpcodeType opCode, /*!< The opcode*/
-          const U32 cmdSeq, /*!< The command sequence number*/
+      void registerTransID_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
+          U16 TransID, /*!< Transaction ID to register */
+          bool used /*!< Register or deregister */
+      );
+
+      void registerProtocol_handler(
+          const NATIVE_INT_TYPE portNum, /*!< The port number*/
           U8 protocol, /*!< Protocol to register */
-          U8 portNum /*!< Port number to register protocol to */
+          bool used /*!< Register or deregister */
       );
 
     PRIVATE:
 
-      U16 APID[32]; /*!< Registered APIDs */
-      U8 protocol[32]; /*!< Registered custom protocols */
+      struct {
+        U16 APID;
+        bool used = false;
+      } APIDs[numCCSDSPorts]; /*!< Registered APIDs */
+
+      struct {
+        U8 protocol;
+        bool used = false;
+      } protocols[numRawPorts]; /*!< Registered custom protocols */
+
+      struct {
+        U8 portNum;
+        bool used = false;
+      } TransIDs[65536]; /*!< Registered transaction IDs */
 
     };
 

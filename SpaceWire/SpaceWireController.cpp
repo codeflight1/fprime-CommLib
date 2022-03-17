@@ -35,11 +35,6 @@ namespace SpaceWire {
     )
   {
     SpaceWireControllerComponentBase::init(queueDepth, instance);
-
-    for (NATIVE_INT_TYPE i = 0; i < 32; i++) {
-      this->APID[i] = 0;
-      this->protocol[i] = 0;
-    }
   }
 
   SpaceWireController ::
@@ -102,8 +97,12 @@ namespace SpaceWire {
           RMAPPacket packet;
           SerDesStatus status = RMAPPacket::decode(packet, fwBuffer);
 
-          if (status == SerDesStatus::SUCCESS) {
-            this->RMAPout_out(0, packet);
+          if (status != SerDesStatus::SUCCESS) {
+            break; // TODO
+          }
+
+          if (this->TransIDs[packet.getTransID()].used == true) {
+            this->RMAPout_out(this->TransIDs[packet.getTransID()].portNum, packet);
           }
         }
         break;
@@ -117,9 +116,10 @@ namespace SpaceWire {
             break; // TODO
           }
 
-          for (NATIVE_INT_TYPE i = 0; i < 32; i++) {
-            if (this->APID[i] == packet.getAPID()) {
+          for (NATIVE_INT_TYPE i = 0; i < numCCSDSPorts; i++) {
+            if (this->APIDs[i].APID == packet.getAPID()) {
               this->CCSDSout_out(i, packet);
+              break;
             }
           }
         }
@@ -127,9 +127,10 @@ namespace SpaceWire {
 
       default:
         {
-          for (NATIVE_INT_TYPE i = 0; i < 32; i++) {
-            if (this->protocol[i] == fwBuffer.getData()[loc + 1]) {
+          for (NATIVE_INT_TYPE i = 0; i < numRawPorts; i++) {
+            if (this->protocols[i].protocol == fwBuffer.getData()[loc + 1]) {
               this->rawOut_out(i, fwBuffer);
+              break;
             }
           }
         }
@@ -146,38 +147,43 @@ namespace SpaceWire {
     this->dataOut_out(0, fwBuffer);
   }
 
-  // ----------------------------------------------------------------------
-  // Command handler implementations
-  // ----------------------------------------------------------------------
-
   void SpaceWireController ::
-    registerAPID_cmdHandler(
-        const FwOpcodeType opCode,
-        const U32 cmdSeq,
+    registerAPID_handler(
+        const NATIVE_INT_TYPE portNum,
         U16 APID,
-        U8 portNum
+        bool used
     )
   {
-    FW_ASSERT(portNum < 32);
+    FW_ASSERT(portNum < numCCSDSPorts);
 
-    this->APID[portNum] = APID;
-
-    this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
+    this->APIDs[portNum].APID = APID;
+    this->APIDs[portNum].used = used;
   }
 
   void SpaceWireController ::
-    registerProtocol_cmdHandler(
-        const FwOpcodeType opCode,
-        const U32 cmdSeq,
-        U8 protocol,
-        U8 portNum
+    registerTransID_handler(
+        const NATIVE_INT_TYPE portNum,
+        U16 TransID,
+        bool used
     )
   {
-    FW_ASSERT(portNum < 32);
+    FW_ASSERT(portNum < numRMAPPorts);
 
-    this->protocol[portNum] = protocol;
+    this->TransIDs[TransID].portNum = portNum;
+    this->TransIDs[TransID].used = used;
+  }
 
-    this->cmdResponse_out(opCode,cmdSeq,Fw::CmdResponse::OK);
+  void SpaceWireController ::
+    registerProtocol_handler(
+        const NATIVE_INT_TYPE portNum,
+        U8 protocol,
+        bool used
+    )
+  {
+    FW_ASSERT(portNum < numRawPorts);
+
+    this->protocols[portNum].protocol = protocol;
+    this->protocols[portNum].used = used;
   }
 
 } // end namespace SpaceWire

@@ -56,6 +56,9 @@ namespace SpaceWire {
 
     this->clearHistory();
 
+    this->invoke_to_registerTransID(1, 0x05, true);
+    this->component.doDispatch();
+
     this->invoke_to_dataIn(0, outbuf);
     this->component.doDispatch();
 
@@ -78,7 +81,7 @@ namespace SpaceWire {
 
     this->clearHistory();
 
-    this->sendCmd_registerAPID(0, 0, 0x57, 0);
+    this->invoke_to_registerAPID(0, 0x57, true);
     this->component.doDispatch();
 
     this->invoke_to_dataIn(0, outbuf);
@@ -96,7 +99,7 @@ namespace SpaceWire {
 
     this->clearHistory();
 
-    this->sendCmd_registerProtocol(0, 0, 0x03, 0);
+    this->invoke_to_registerProtocol(0, 0x03, true);
     this->component.doDispatch();
 
     this->invoke_to_dataIn(0, outbuf);
@@ -209,16 +212,12 @@ namespace SpaceWire {
     }
 
     // RMAPin
-    this->connect_to_RMAPin(
-        0,
-        this->component.get_RMAPin_InputPort(0)
-    );
-
-    // cmdIn
-    this->connect_to_cmdIn(
-        0,
-        this->component.get_cmdIn_InputPort(0)
-    );
+    for (NATIVE_INT_TYPE i = 0; i < 32; ++i) {
+      this->connect_to_RMAPin(
+          i,
+          this->component.get_RMAPin_InputPort(i)
+      );
+    }
 
     // dataIn
     this->connect_to_dataIn(
@@ -234,6 +233,30 @@ namespace SpaceWire {
       );
     }
 
+    // registerAPID
+    for (NATIVE_INT_TYPE i = 0; i < 32; ++i) {
+      this->connect_to_registerAPID(
+          i,
+          this->component.get_registerAPID_InputPort(i)
+      );
+    }
+
+    // registerProtocol
+    for (NATIVE_INT_TYPE i = 0; i < 32; ++i) {
+      this->connect_to_registerProtocol(
+          i,
+          this->component.get_registerProtocol_InputPort(i)
+      );
+    }
+
+    // registerTransID
+    for (NATIVE_INT_TYPE i = 0; i < 32; ++i) {
+      this->connect_to_registerTransID(
+          i,
+          this->component.get_registerTransID_InputPort(i)
+      );
+    }
+
     // CCSDSout
     for (NATIVE_INT_TYPE i = 0; i < 32; ++i) {
       this->component.set_CCSDSout_OutputPort(
@@ -243,22 +266,12 @@ namespace SpaceWire {
     }
 
     // RMAPout
-    this->component.set_RMAPout_OutputPort(
-        0,
-        this->get_from_RMAPout(0)
-    );
-
-    // cmdRegOut
-    this->component.set_cmdRegOut_OutputPort(
-        0,
-        this->get_from_cmdRegOut(0)
-    );
-
-    // cmdResponseOut
-    this->component.set_cmdResponseOut_OutputPort(
-        0,
-        this->get_from_cmdResponseOut(0)
-    );
+    for (NATIVE_INT_TYPE i = 0; i < 32; ++i) {
+      this->component.set_RMAPout_OutputPort(
+          i,
+          this->get_from_RMAPout(i)
+      );
+    }
 
     // dataOut
     this->component.set_dataOut_OutputPort(
@@ -273,9 +286,6 @@ namespace SpaceWire {
           this->get_from_rawOut(i)
       );
     }
-
-
-
 
   }
 
