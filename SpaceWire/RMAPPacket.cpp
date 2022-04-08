@@ -1,6 +1,6 @@
-#include <SpaceWire/RMAPPacket.hpp>
+#include "RMAPPacket.hpp"
 
-#include <SpaceWire/SpaceWireAddr.hpp>
+#include "SpaceWireAddr.hpp"
 #include <SpaceWire/SpaceWireProtocolIDEnumAc.hpp>
 #include <cstdlib>
 #include <cstring> // memcpy

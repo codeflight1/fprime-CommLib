@@ -6,10 +6,10 @@
 // ======================================================================
 
 
-#include <SpaceWire/SpaceWireController.hpp>
+#include "SpaceWireController.hpp"
 #include <SpaceWire/SpaceWireProtocolIDEnumAc.cpp>
-#include <SpaceWire/RMAPPacket.cpp>
-#include <SpaceWire/CCSDSPacket.cpp>
+#include "RMAPPacket.cpp"
+#include "CCSDSPacket.cpp"
 #include "Fw/Types/BasicTypes.hpp"
 
 #include <cstdlib> // malloc

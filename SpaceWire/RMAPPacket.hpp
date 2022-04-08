@@ -7,7 +7,7 @@
 #ifndef RMAPPACKET_HPP_
 #define RMAPPACKET_HPP_
 
-#include <SpaceWire/SpaceWireAddr.hpp>
+#include "SpaceWireAddr.hpp"
 #include <SpaceWire/RMAPPacketBaseSerializableAc.hpp>
 #include <SpaceWire/SerDesStatusEnumAc.hpp>
 

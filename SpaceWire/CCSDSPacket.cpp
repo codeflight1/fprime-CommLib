@@ -1,4 +1,4 @@
-#include <SpaceWire/CCSDSPacket.hpp>
+#include "CCSDSPacket.hpp"
 
 #include <SpaceWire/SpaceWireProtocolIDEnumAc.hpp>
 
