@@ -1,6 +1,6 @@
-# SpaceWire
+# fprime-CommLib
 
-A SpaceWire module for [F Prime](https://github.com/nasa/fprime).
+A communication protocol library for [F Prime](https://github.com/nasa/fprime).
 
 ## Features:
 ### RMAP Packet Encoding/Decoding (80%)
@@ -15,7 +15,7 @@ A SpaceWire module for [F Prime](https://github.com/nasa/fprime).
 * Secondary header support
 * Documentation
 
-### Driver bridge (80%)
+### SpaceWire driver bridge (80%)
 #### Todo:
 * Error handling
 * Proper memory allocation
@@ -23,3 +23,4 @@ A SpaceWire module for [F Prime](https://github.com/nasa/fprime).
 
 ## Planned Features
 * RMAP Target Component
+* Nanosatellite Protocol (NSP) support
